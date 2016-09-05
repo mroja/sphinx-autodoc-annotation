@@ -1,6 +1,6 @@
 import inspect
 
-from sphinx.ext.autodoc import FunctionDocumenter, MethodDocumenter
+from sphinx.ext.autodoc import FunctionDocumenter, MethodDocumenter, ClassDocumenter
 
 def get_class_link(obj):
     if (obj is None) or (obj == inspect.Signature.empty):
@@ -77,6 +77,18 @@ class MyMethodDocumenter(MethodDocumenter):
         
         return result
 
+
+class MyClassDocumenter(ClassDocumenter):
+    def get_doc(self, *args, **kwargs):
+        result = super().get_doc(*args, **kwargs)
+        
+        if result:
+            add_annotation_content(self.object, result[-1])
+        
+        return result
+
+
 def setup(app):
     app.add_autodocumenter(MyFunctionDocumenter)
     app.add_autodocumenter(MyMethodDocumenter)
+    app.add_autodocumenter(MyClassDocumenter)
