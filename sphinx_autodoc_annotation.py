@@ -1,4 +1,5 @@
 import inspect
+import typing
 
 from sphinx.ext.autodoc import FunctionDocumenter, MethodDocumenter, ClassDocumenter
 
@@ -7,7 +8,17 @@ def get_class_link(obj):
         return None
     if inspect.isclass(obj):
         if obj.__module__ == 'builtins':
-            return "``%s``" % obj.__qualname__
+            return ":class:`%s`" % obj.__qualname__
+        elif obj.__module__ == 'typing':
+            if obj.__qualname__ == 'Union':
+                params = []
+                for p in obj.__union_params__:
+                    fullname = '%s.%s' % (p.__module__, p.__qualname__)
+                    params.append(':class:`~%s`' % fullname)
+                return ' or '.join(params)
+            else:
+                fullname = '%s.%s' % (obj.__module__, obj.__qualname__)
+                return ':class:`~%s`' % fullname
         else:
             fullname = '%s.%s' % (obj.__module__, obj.__qualname__)
             return ':class:`~%s`' % fullname
